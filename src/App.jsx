@@ -5,16 +5,20 @@ export default function App() {
   const [curr2, setCurr2] = useState("EUR");
   const [input, setInput] = useState(0);
   const [convRate, setConvRate] = useState(0);
-  const output = (input * convRate) / 100;
+  const [isLoading, setIsLoading] = useState(false);
+  const output = input * convRate;
 
   useEffect(
     function () {
+      setIsLoading(true);
       async function fetchCurrency() {
         const res = await fetch(
-          `https://api.frankfurter.app/latest?amount=100&from=${curr1}&to=${curr2}`
+          `https://api.frankfurter.app/latest?amount=1&from=${curr1}&to=${curr2}`
         );
         const data = await res.json();
-        setConvRate(Object.values(data.rates)[0]);
+        console.log("🚀 ~ fetchCurrency ~ data:", data);
+        setConvRate(data.rates[curr2]);
+        setIsLoading(false);
       }
       fetchCurrency();
     },
@@ -51,8 +55,7 @@ export default function App() {
         <option value="CAD">CAD</option>
         <option value="GBP">GBP</option>
       </select>
-      <p>OUTPUT:</p>
-      <p>{output}</p>
+      <p>{isLoading ? "Loading..." : `${input} ${curr1} = ${output.toFixed(2)} ${curr2}`}</p>
     </div>
   );
 }
